@@ -1,10 +1,14 @@
-$("#run").click(function() {
-  console.log("version 1.1");
+console.info("version 1.2");
+// try it without jQuery...:
+var el = document.getElementById("run");
+el.addEventListener("click", getRelevantStyle, false);
+
+function getRelevantStyle() {
   var checkbox = document.getElementById("checkbox").checked;
-  var checkbox = document.getElementById("checkbox").checked;
-  if (checkbox2) {
-    var classs = ["a", "abbr", "article", "aside", "audio", "b", "blockquote", "body", "button", "canvas", "caption", "cite", "code", "colgroup", "dd", "details", "dfn", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "header", "hr", "html", "i", "iframe", "img", "input", "kbd", "label", "legend", "li", "main", "mark", "menu", "nav", "object", "ol", "optgroup", "output", "p", "pre", "progress", "q", "samp", "section", "select", "small", "span", "strong", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "tr", "ul", "video"]
-  }
+  // var checkbox = document.getElementById("checkbox").checked;
+  // if (checkbox2) {
+  //   var classs = ["a", "abbr", "article", "aside", "audio", "b", "blockquote", "body", "button", "canvas", "caption", "cite", "code", "colgroup", "dd", "details", "dfn", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "header", "hr", "html", "i", "iframe", "img", "input", "kbd", "label", "legend", "li", "main", "mark", "menu", "nav", "object", "ol", "optgroup", "output", "p", "pre", "progress", "q", "samp", "section", "select", "small", "span", "strong", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "tr", "ul", "video"]
+  // }
   if (checkbox) {
     var Classes = getClasses();
     for (var i = 0; i < getClasses.length; i++) {
@@ -25,7 +29,7 @@ $("#run").click(function() {
   }
   classsTexta = document.getElementById("classs");
   classsTexta.value = classNotation.join(", ");
-  console.log(classs);
+  console.debug(classs);
   
   // first I'll all the media queries for the three different resulutions in 
   // three difierent arrays and remove them all from the library.
@@ -67,20 +71,20 @@ $("#run").click(function() {
 
 
   style = getStyle(bootxs, classs);
-  if (getStyle(res768, classs)) {
-    style += "@media (min-width:768px){" + getStyle(res768, classs) + "}";
+  if (getStyle(res768, classs, "768 first")) {
+    style += "@media (min-width:768px){" + getStyle(res768, classs, "768") + "}";
   }
-  if (getStyle(res992, classs)) {
-    style += "@media (min-width:992px){" + getStyle(res992, classs) + "}";
+  if (getStyle(res992, classs, "992 first")) {
+    style += "@media (min-width:992px){" + getStyle(res992, classs, "992") + "}";
   }
-  if (getStyle(res1200, classs)) {
-    style += "@media (min-width:1200px){" + getStyle(res1200, classs) + "}";
+  if (getStyle(res1200, classs, "1200 first")) {
+    style += "@media (min-width:1200px){" + getStyle(res1200, classs, "1200") + "}";
   }
 
-  // console.log(style);
+  // console.debug(style);
   var result = document.getElementById("to_style");
   result.value = style;
-});
+}
 
 // 
 function getClasses() {
@@ -108,29 +112,57 @@ function getClasses() {
 
 // function for returning the style
 function getStyle(styleStr, classes) {
+  if (arguments[2])
+    console.warn(arguments[2]);
+
   var res = [];
+  console.debug(classes.length);
   for (var i = 0; i < classes.length; i++) {
+    console.debug("i =", i);
   // TODO: adjust the regex to allow for comma seperated selectors: .some, .thing, .else {do:something;}
 
-    // var re = new RegExp("\\." + classes[i] + "\\{[^\\}]+\\}", "g"), 
-    var re = new RegExp("(?:\\.\\w*,)*(\\." + classes[i] + ")(?:,\\.\\w*)*(\\{[^\\}]+\\})", "g");
-    if (styleStr.match(re) === null){
-      continue;
-    }
-    while(m = re.exec(styleStr) !== null) {
-      var m = m[1] + m[2];
-      if (res.indexOf(m) === -1){
-        res.push(m);
+    var re = new RegExp("\\." + classes[i] + "\\{[^\\}]+\\}", "g"); 
+    var matches = styleStr.match(re);
+    console.debug("matches.length:", matches.length, "classes[i]:", classes[i]);
+    for (var j = 0; j < matches.length; j++) {
+       console.debug("matches[j]", matches[j]);
+       if (res.indexOf(matches[j]) === -1){
+        console.debug("It's a new match");
+        res.push(matches[j]);
       }
     }
-
-    // console.log("matches.length:", matches.length, "classes[i]:", classes[i]);
-    // for (var j = 0; j < matches.length; j++) {
-    //    // console.log("matches[j]", matches[j]);
-    //    if (res.indexOf(matches[j]) === -1){
-    //     res.push(matches[j]);
-    //   }
-    // }
   }
   return res.join("");
 }
+
+    // var re = new RegExp("(?:\\.\\w*,)*(\\." + classes[i] + ")(?:,\\.\\w*)*(\\{[^\\}]+\\})", "g");
+    // if (styleStr.match(re) === null){
+    //   continue;
+    // }
+    // while(m = re.exec(styleStr) !== null) {
+    //   var m = m[1] + m[2];
+    //   if (res.indexOf(m) === -1){
+    //     res.push(m);
+    //   }
+    // }
+
+
+// https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css
+
+function makeHttpObject() {
+  try {return new XMLHttpRequest();}
+  catch (error) {}
+  try {return new ActiveXObject("Msxml2.XMLHTTP");}
+  catch (error) {}
+  try {return new ActiveXObject("Microsoft.XMLHTTP");}
+  catch (error) {}
+
+  throw new Error("Could not create HTTP request object.");
+}
+var request = makeHttpObject();
+request.open("GET", "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css", true);
+request.send(null);
+request.onreadystatechange = function() {
+  if (request.readyState == 4)
+    return request.responseText;
+};
